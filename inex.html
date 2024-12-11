@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Average Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result, .letter-grade {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .about-me {
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grade Average Calculator</h1>
+
+        <!-- Section for adding classes -->
+        <div id="class-container">
+            <div class="class" id="class1">
+                <h3>Class 1</h3>
+                <label for="grade1">Grade:</label>
+                <input type="number" id="grade1" placeholder="Enter grade" />
+                <label for="weight1">Weight:</label>
+                <input type="number" id="weight1" placeholder="Enter weight" />
+                <button onclick="addClass()">Add Class</button>
+                <button onclick="calculateAverage('class1')">Calculate Average</button>
+                <button onclick="resetFields('class1')">Reset</button>
+                <div id="result1" class="result"></div>
+                <div id="letter-grade1" class="letter-grade"></div>
+            </div>
+        </div>
+
+        <!-- About Me Section -->
+        <div class="about-me">
+            <h2>About Me</h2>
+            <p>This is a personal grade average calculator where you can track your grades for different classes. You can enter multiple grades for each class, see the calculated average, and check how far you are from the next grade.</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate the weighted average for each class
+        function calculateAverage(classId) {
+            let totalWeight = 0;
+            let weightedSum = 0;
+
+            const gradeInput = document.querySelector(`#${classId} input[type="number"]:nth-child(1)`);
+            const weightInput = document.querySelector(`#${classId} input[type="number"]:nth-child(2)`);
+            
+            const grade = parseFloat(gradeInput.value);
+            const weight = parseFloat(weightInput.value);
+
+            // Validate input values
+            if (isNaN(grade) || isNaN(weight) || grade < 0 || weight <= 0) {
+                alert("Please enter valid numbers for the grade and weight.");
+                return;
+            }
+
+            weightedSum += grade * weight;
+            totalWeight += weight;
+
+            const weightedAverage = weightedSum / totalWeight;
+            const letterGrade = getLetterGrade(weightedAverage);
+
+            // Save to localStorage
+            localStorage.setItem(`${classId}_grade`, grade);
+            localStorage.setItem(`${classId}_weight`, weight);
+
+            // Display results
+            document.getElementById(`result${classId.slice(-1)}`).innerHTML = `Your weighted average is: ${weightedAverage.toFixed(2)}`;
+            document.getElementById(`letter-grade${classId.slice(-1)}`).innerHTML = `Letter grade: ${letterGrade.grade} (${letterGrade.message})`;
+
+            // Save the result in localStorage
+            localStorage.setItem(`${classId}_average`, weightedAverage.toFixed(2));
+        }
+
+        // Get letter grade and distance to the next grade
+        function getLetterGrade(average) {
+            if (average >= 97) {
+                return { grade: 'A+', message: 'You are 0.0 points away from an A+' };
+            } else if (average >= 93) {
+                return { grade: 'A', message: 'You are ' + (97 - average).toFixed(2) + ' points away from an A+' };
+            } else if (average >= 90) {
+                return { grade: 'A-', message: 'You are ' + (93 - average).toFixed(2) + ' points away from an A' };
+            } else if (average >= 87) {
+                return { grade: 'B+', message: 'You are ' + (90 - average).toFixed(2) + ' points away from an A-' };
+            } else if (average >= 83) {
+                return { grade: 'B', message: 'You are ' + (87 - average).toFixed(2) + ' points away from a B+' };
+            } else if (average >= 80) {
+                return { grade: 'B-', message: 'You are ' + (83 - average).toFixed(2) + ' points away from a B' };
+            } else if (average >= 77) {
+                return { grade: 'C+', message: 'You are ' + (80 - average).toFixed(2) + ' points away from a B-' };
+            } else if (average >= 73) {
+                return { grade: 'C', message: 'You are ' + (77 - average).toFixed(2) + ' points away from a C+' };
+            } else if (average >= 70) {
+                return { grade: 'C-', message: 'You are ' + (73 - average).toFixed(2) + ' points away from a C' };
+            } else if (average >= 67) {
+                return { grade: 'D+', message: 'You are ' + (70 - average).toFixed(2) + ' points away from a C-' };
+            } else if (average >= 63) {
+                return { grade: 'D', message: 'You are ' + (67 - average).toFixed(2) + ' points away from a D+' };
+            } else if (average >= 60) {
+                return { grade: 'D-', message: 'You are ' + (63 - average).toFixed(2) + ' points away from a D' };
+            } else {
+                return { grade: 'F', message: 'You are ' + (60 - average).toFixed(2) + ' points away from a D-' };
+            }
+        }
+
+        // Add a new class dynamically
+        function addClass() {
+            const classContainer = document.getElementById('class-container');
+            const classCount = classContainer.getElementsByClassName('class').length + 1;
+            const newClass = document.createElement('div');
+            newClass.classList.add('class');
+            newClass.id = `class${classCount}`;
+            newClass.innerHTML = `
+                <h3>Class ${classCount}</h3>
+                <label for="grade${classCount}">Grade:</label>
+                <input type="number" id="grade${classCount}" placeholder="Enter grade" />
+                <label for="weight${classCount}">Weight:</label>
+                <input type="number" id="weight${classCount}" placeholder="Enter weight" />
+                <button onclick="calculateAverage('class${classCount}')">Calculate Average</button>
+                <button onclick="resetFields('class${classCount}')">Reset</button>
+                <div id="result${classCount}" class="result"></div>
+                <div id="letter-grade${classCount}" class="letter-grade"></div>
+            `;
+            classContainer.appendChild(newClass);
+        }
+
+        // Reset fields for a specific class
+        function resetFields(classId) {
+            document.querySelector(`#${classId} input[type="number"]:nth-child(1)`).value = '';
+            document.querySelector(`#${classId} input[type="number"]:nth-child(2)`).value = '';
+            document.getElementById(`result${classId.slice(-1)}`).innerHTML = '';
+            document.getElementById(`letter-grade${classId.slice(-1)}`).innerHTML = '';
+            localStorage.removeItem(`${classId}_grade`);
+            localStorage.removeItem(`${classId}_weight`);
+            localStorage.removeItem(`${classId}_average`);
+        }
+
+        // Load saved data from localStorage on page load
+        window.onload = () => {
+            for (let i = 1; i <= localStorage.length / 3; i++) {
+                const grade = localStorage.getItem(`class${i}_grade`);
+                const weight = localStorage.getItem(`class${i}_weight`);
+                if (grade && weight) {
+                    document.getElementById(`grade${i}`).value = grade;
+                    document.getElementById(`weight${i}`).value = weight;
+                    calculateAverage(`class${i}`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
